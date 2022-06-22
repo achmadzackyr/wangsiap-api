@@ -1,0 +1,78 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Resources\CustomerResource;
+use App\Models\Customer;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
+class CustomerController extends Controller
+{
+    public function index()
+    {
+        $customers = Customer::latest()->paginate(10);
+        return new CustomerResource(true, 'List Data Customers', $customers);
+    }
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required',
+            'alamat' => 'required',
+            'kodepos' => 'required',
+            'hp' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $customer = Customer::create([
+            'nama' => $request->nama,
+            'alamat' => $request->alamat,
+            'kecamatan' => $request->kecamatan,
+            'kota' => $request->kota,
+            'kodepos' => $request->kodepos,
+            'hp' => $request->hp,
+        ]);
+
+        return new CustomerResource(true, 'Customer Successfully Added!', $customer);
+    }
+
+    public function show(Customer $customer)
+    {
+        return new CustomerResource(true, 'Customer Found!', $customer);
+    }
+
+    public function update(Request $request, Customer $customer)
+    {
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required',
+            'alamat' => 'required',
+            'kodepos' => 'required',
+            'hp' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $customer->update([
+            'nama' => $request->nama,
+            'alamat' => $request->alamat,
+            'kecamatan' => $request->kecamatan,
+            'kota' => $request->kota,
+            'kodepos' => $request->kodepos,
+            'hp' => $request->hp,
+        ]);
+        return new CustomerResource(true, 'Customer Successfully Updated!', $customer);
+    }
+
+    public function destroy(Customer $customer)
+    {
+        $customer->delete();
+        return new CustomerResource(true, 'Customer Successfully Deleted!', null);
+    }
+}
