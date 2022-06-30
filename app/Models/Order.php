@@ -30,4 +30,9 @@ class Order extends Model
     {
         return $this->belongsTo(OrderStatus::class, 'order_status_id');
     }
+
+    public function ordered_products()
+    {
+        return $this->hasMany(OrderedProduct::class);
+    }
 }
