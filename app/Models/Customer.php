@@ -15,4 +15,9 @@ class Customer extends Model
     {
         return $this->belongsTo(CustomerStatus::class, 'customer_status_id');
     }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }
