@@ -36,6 +36,8 @@ class CustomerController extends Controller
             'kota' => $request->kota,
             'kodepos' => $request->kodepos,
             'hp' => $request->hp,
+            'order_date_string' => date("d-m-Y H:i:s", strtotime('+7 hours')),
+            'customer_status_id' => 1,
         ]);
 
         return new CustomerResource(true, 'Customer Successfully Added!', $customer);

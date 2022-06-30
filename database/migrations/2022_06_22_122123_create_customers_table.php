@@ -15,12 +15,15 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('customer_status_id');
             $table->string('nama');
             $table->string('alamat');
             $table->string('kecamatan')->nullable();
             $table->string('kota')->nullable();
             $table->string('kodepos');
             $table->string('hp');
+            $table->string('order_date_string');
+            $table->foreign('customer_status_id')->references('id')->on('customer_statuses')->onDelete('cascade');
             $table->timestamps();
         });
     }
