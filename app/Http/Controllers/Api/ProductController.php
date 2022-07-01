@@ -106,4 +106,21 @@ class ProductController extends Controller
         $product->delete();
         return new ProductResource(true, 'Product Successfully Deleted!', null);
     }
+
+    public function getBySku(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'sku' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(new ProductResource(false, $validator->errors(), null), 422);
+        }
+
+        $product = Product::where('sku', $request->sku)->first();
+        if ($product == null) {
+            return response()->json(new ProductResource(false, 'Product Not Found', null), 422);
+        }
+        return new ProductResource(true, 'Product Found', $product);
+    }
 }
