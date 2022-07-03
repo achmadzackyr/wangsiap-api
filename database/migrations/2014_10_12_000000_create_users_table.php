@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('hp');
             $table->boolean('gender')->nullable();
             $table->string('jne_id')->nullable();
+            $table->string('jne_id_cod')->nullable();
             $table->string('alamat')->nullable();
             $table->string('kecamatan')->nullable();
             $table->string('kota')->nullable();

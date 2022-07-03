@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\OrderedProductController;
 use App\Http\Controllers\Api\OrderStatusController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,7 @@ Route::apiResource('/payments', PaymentController::class);
 Route::apiResource('/orders', OrderController::class);
 Route::apiResource('/order-status', OrderStatusController::class);
 Route::apiResource('/products', ProductController::class);
+Route::apiResource('/users', UserController::class);
 
 Route::post('/products/getBySku', [ProductController::class, 'getBySku']);
 Route::post('/gateway/order', [GatewayController::class, 'order']);

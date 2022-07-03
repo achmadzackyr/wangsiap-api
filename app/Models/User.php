@@ -23,6 +23,7 @@ class User extends Authenticatable
         'hp',
         'gender',
         'jne_id',
+        'jne_id_cod',
         'alamat',
         'kecamatan',
         'kota',

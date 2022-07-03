@@ -43,7 +43,7 @@ class ProductController extends Controller
                 'lebar' => $request->lebar,
                 'tinggi' => $request->tinggi,
                 'panjang' => $request->panjang,
-                'dibuat_pada_string' => date("d-m-Y H:i:s", strtotime('+7 hours')),
+                'dibuat_pada_string' => date("d-m-Y H:i:s"),
                 'pecah_belah' => $request->pecah_belah,
                 'aktif' => true,
             ]);

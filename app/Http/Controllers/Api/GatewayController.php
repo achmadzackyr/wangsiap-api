@@ -42,7 +42,7 @@ class GatewayController extends Controller
             //'kota' => $request->kota,
             'kodepos' => $mEx[3],
             'hp' => $mEx[4],
-            'order_date_string' => date("d-m-Y H:i:s", strtotime('+7 hours')),
+            'order_date_string' => date("d-m-Y H:i:s"),
         ]);
 
         //insert to orders
@@ -59,7 +59,7 @@ class GatewayController extends Controller
             'payment_id' => $payment_method,
             'user_id' => 1,
             'order_status_id' => 1,
-            'tanggal_pesan_string' => date("d-m-Y H:i:s", strtotime('+7 hours')),
+            'tanggal_pesan_string' => date("d-m-Y H:i:s"),
             'total_harga' => $total_harga,
             'total_berat' => $total_berat,
             'total_pcs' => $mEx[6],

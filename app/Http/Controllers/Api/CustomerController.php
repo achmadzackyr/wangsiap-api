@@ -38,7 +38,7 @@ class CustomerController extends Controller
             'kota' => $request->kota,
             'kodepos' => $request->kodepos,
             'hp' => $request->hp,
-            'order_date_string' => date("d-m-Y H:i:s", strtotime('+7 hours')),
+            'order_date_string' => date("d-m-Y H:i:s"),
             'customer_status_id' => 1,
         ]);
 

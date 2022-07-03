@@ -25,6 +25,7 @@ class UserSeeder extends Seeder
             'kodepos' => '46271',
             'gender' => false,
             'jne_id' => '123',
+            'jne_id_cod' => '456',
             'password' => bcrypt('12345678'),
         ]);
     }
