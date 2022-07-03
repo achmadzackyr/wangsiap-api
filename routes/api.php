@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\CustomerStatusController;
 use App\Http\Controllers\Api\GatewayController;
@@ -9,22 +10,22 @@ use App\Http\Controllers\Api\OrderStatusController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
- */
+Route::controller(AuthController::class)->group(function () {
+    Route::post('/auth/register', 'register');
+    Route::post('/auth/login', 'login');
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+    Route::middleware('auth:sanctum')->group(function () {
+
+        Route::prefix('/auth/profile')->group(function () {
+            Route::get('/', 'profile');
+            Route::post('/', 'update');
+        });
+
+        Route::post('/auth/logout', 'logout');
+    });
+
 });
 
 Route::apiResource('/customers', CustomerController::class);
