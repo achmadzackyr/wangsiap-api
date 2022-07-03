@@ -12,10 +12,13 @@
         "laravel/sanctum": "^2.14.1",
         "laravel/tinker": "^2.7",
         "maatwebsite/excel": "^3.1",
-        "psr/simple-cache": "1.0"
+        "psr/simple-cache": "1.0",
+        "symfony/http-client": "^6.0",
+        "symfony/mailgun-mailer": "^6.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
+        "laravel-lang/lang": "^11.0",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^6.1",

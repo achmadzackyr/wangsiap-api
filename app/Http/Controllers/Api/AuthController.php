@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Auth;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Validator;
 
 class AuthController extends Controller
@@ -117,5 +120,76 @@ class AuthController extends Controller
     {
         auth()->user()->tokens()->delete();
         return new UserResource(true, 'You have been logged out', null);
+    }
+
+    public function forgot(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(new UserResource(false, $validator->errors(), null), 422);
+        }
+
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+        if ($status === Password::RESET_LINK_SENT) {
+            return new UserResource(true, 'Password reset link has been sent', $status);
+        } else {
+            return response()->json(new UserResource(false, $status, null), 422);
+        }
+
+        switch ($status) {
+            case Password::RESET_LINK_SENT:
+                return new UserResource(true, 'Password reset link has been sent', $status);
+                break;
+            case Password::RESET_THROTTLED:
+                return response()->json(new UserResource(false, "Please wait 60 seconds to request link again", null), 400);
+                break;
+            default:
+                return response()->json(new UserResource(false, $status, null), 422);
+        }
+    }
+
+    public function reset(Request $request)
+    {
+        $input = $request->only('email', 'token', 'password', 'password_confirmation');
+        $validator = Validator::make($input, [
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:6',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(new UserResource(false, $validator->errors(), null), 422);
+        }
+
+        $response = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => bcrypt($password),
+                ])->setRememberToken(Str::random(60));
+
+                $user->save();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        switch ($response) {
+            case Password::PASSWORD_RESET:
+                return new UserResource(true, 'Password reset successfully', $response);
+                break;
+            case Password::INVALID_TOKEN:
+                return response()->json(new UserResource(false, "Invalid token provided", null), 400);
+                break;
+            case Password::INVALID_USER:
+                return response()->json(new UserResource(false, "Email not found", null), 500);
+                break;
+            default:
+                return response()->json(new UserResource(false, $response, null), 500);
+        }
     }
 }
