@@ -50,7 +50,6 @@ class PassportAuthController extends Controller
 
         $token = $user->createToken('Laravel9PassportAuth')->accessToken;
         $user->token = $token;
-
         return new UserResource(true, 'User Successfully Added!', $user);
     }
 
