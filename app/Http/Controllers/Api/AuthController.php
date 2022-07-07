@@ -60,6 +60,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         try {
+            return $request->first;
             if (!Auth::attempt($request->only('email', 'password'))) {
                 return response()->json(new UserResource(false, "Unauthorized", null), 401);
             }
@@ -69,8 +70,8 @@ class AuthController extends Controller
             $user->token = $token;
 
             return new UserResource(true, 'You Successfully Logged In!', $user);
-        } catch (\Exception$e) {
-            return response()->json(new UserResource(false, $e->getMessage(), null), 422);
+        } catch (\Throwable$th) {
+            return response()->json(new UserResource(false, $th->getMessage(), null), 422);
         }
     }
 
