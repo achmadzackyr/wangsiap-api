@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\GatewayController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OrderedProductController;
 use App\Http\Controllers\Api\OrderStatusController;
+use App\Http\Controllers\API\PassportAuthController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
@@ -27,6 +28,13 @@ Route::controller(AuthController::class)->group(function () {
         Route::post('/auth/logout', 'logout');
     });
 
+});
+
+Route::post('auth/register', [PassportAuthController::class, 'register']);
+Route::post('auth/login', [PassportAuthController::class, 'login']);
+
+Route::middleware('auth:api')->group(function () {
+    Route::get('auth/profile', [PassportAuthController::class, 'profile']);
 });
 
 Route::apiResource('/customers', CustomerController::class);
