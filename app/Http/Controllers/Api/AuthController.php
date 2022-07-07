@@ -69,8 +69,8 @@ class AuthController extends Controller
             $user->token = $token;
 
             return new UserResource(true, 'You Successfully Logged In!', $user);
-        } catch (\Throwable$th) {
-            return response()->json(new UserResource(false, $th->getMessage(), null), 422);
+        } catch (\Exception$e) {
+            return response()->json(new UserResource(false, $e->getMessage(), null), 422);
         }
     }
 
