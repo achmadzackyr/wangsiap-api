@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::controller(AuthController::class)->group(function () {
     Route::post('/auth/register', 'register');
-    // Route::post('/auth/login', 'login');
+    Route::post('/auth/login', 'login');
     Route::post('/auth/forgot-password', 'forgot');
     Route::post('/auth/reset-password', 'reset');
 
@@ -44,4 +44,3 @@ Route::post('/gateway/order', [GatewayController::class, 'order']);
 Route::post('/gateway/order-list', [GatewayController::class, 'orderList']);
 Route::get('/gateway/downloadLoader', [GatewayController::class, 'downloadLoader']);
 Route::get('/customers/export/all', [CustomerController::class, 'export']);
-Route::post('/auth/login', [AuthController::class, 'login']);
