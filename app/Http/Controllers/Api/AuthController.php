@@ -60,7 +60,6 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         try {
-            return $request->first;
             if (!Auth::attempt($request->only('email', 'password'))) {
                 return response()->json(new UserResource(false, "Unauthorized", null), 401);
             }
