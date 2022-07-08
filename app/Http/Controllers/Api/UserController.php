@@ -61,7 +61,6 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'nama' => 'required',
             'email' => 'required|email',
-            'password' => 'required|min:6',
             'hp' => 'required',
         ]);
 
@@ -73,7 +72,6 @@ class UserController extends Controller
             $user->update([
                 'nama' => $request->nama,
                 'email' => $request->email,
-                'password' => bcrypt($request->password),
                 'hp' => $request->hp,
                 'gender' => $request->gender,
                 'jne_id' => $request->jne_id,
