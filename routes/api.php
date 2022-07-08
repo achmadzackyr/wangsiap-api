@@ -23,7 +23,6 @@ Route::controller(AuthController::class)->group(function () {
             Route::get('/', 'profile');
             Route::post('/', 'update');
         });
-
         Route::post('/auth/logout', 'logout');
     });
 
