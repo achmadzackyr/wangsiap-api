@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('sku')->unique();
             $table->string('nama');
+            $table->string('deskripsi');
             $table->decimal('harga', $precision = 10, $scale = 2);
             $table->decimal('berat', $precision = 8, $scale = 2);
             $table->decimal('lebar', $precision = 6, $scale = 2);

@@ -27,6 +27,7 @@ class ProductController extends Controller
             'tinggi' => 'required',
             'panjang' => 'required',
             'pecah_belah' => 'required',
+            'deskripsi' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -43,6 +44,7 @@ class ProductController extends Controller
                 'lebar' => $request->lebar,
                 'tinggi' => $request->tinggi,
                 'panjang' => $request->panjang,
+                'deskripsi' => $request->deskripsi,
                 'dibuat_pada_string' => date("d-m-Y H:i:s"),
                 'pecah_belah' => $request->pecah_belah,
                 'aktif' => true,
@@ -72,6 +74,7 @@ class ProductController extends Controller
             'lebar' => 'required',
             'tinggi' => 'required',
             'panjang' => 'required',
+            'deskripsi' => 'required',
             'pecah_belah' => 'required',
             'aktif' => 'required',
         ]);
@@ -89,6 +92,7 @@ class ProductController extends Controller
                 'lebar' => $request->lebar,
                 'tinggi' => $request->tinggi,
                 'panjang' => $request->panjang,
+                'deskripsi' => $request->deskripsi,
                 'pecah_belah' => $request->pecah_belah,
                 'aktif' => $request->aktif,
             ]);
