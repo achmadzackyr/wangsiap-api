@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\OrderStatusController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\WaSessionController;
 use Illuminate\Support\Facades\Route;
 
 Route::controller(AuthController::class)->group(function () {
@@ -36,7 +37,10 @@ Route::apiResource('/orders', OrderController::class);
 Route::apiResource('/order-status', OrderStatusController::class);
 Route::apiResource('/products', ProductController::class);
 Route::apiResource('/users', UserController::class);
+Route::apiResource('/wa-sessions', WaSessionController::class);
 
+Route::post('/wa-sessions/get-by-user-id', [WaSessionController::class, 'getByUserId']);
+Route::post('/wa-sessions/set-session/{wa_session}', [WaSessionController::class, 'setSession']);
 Route::post('/products/getBySku', [ProductController::class, 'getBySku']);
 Route::post('/gateway/order', [GatewayController::class, 'order']);
 Route::post('/gateway/order-list', [GatewayController::class, 'orderList']);

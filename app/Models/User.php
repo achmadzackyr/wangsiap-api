@@ -66,4 +66,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class);
     }
+
+    public function wa_sessions()
+    {
+        return $this->hasMany(WaSession::class);
+    }
 }
