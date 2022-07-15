@@ -10,6 +10,8 @@ use App\Models\OrderedProduct;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -25,8 +27,11 @@ class GatewayController extends Controller
     {
         $message = $request->message;
         $sender = $request->sender;
+        $order_status_id = $request->order_status_id;
 
         $mEx = explode('#', $message);
+
+        //get user from auth
 
         //search product by sku
         $product = Product::where('sku', $mEx[5])->first();
@@ -34,35 +39,61 @@ class GatewayController extends Controller
             return response()->json(new GatewayResource(false, 'Product Not Found', null), 404);
         }
 
+        //get destination
+        $destination = DB::table('jne_destination')->where('ZIP_CODE', $mEx[3])->first();
+        if ($destination == null) {
+            return response()->json(new GatewayResource(false, 'Destination Not Found', null), 404);
+        }
+
         $customer = Customer::create([
             'customer_status_id' => 1,
             'nama' => $mEx[1],
             'alamat' => $mEx[2],
-            //'kecamatan' => $request->kecamatan,
-            //'kota' => $request->kota,
+            'kecamatan' => $destination->DISTRICT_NAME,
+            'kota' => $destination->CITY_NAME,
             'kodepos' => $mEx[3],
             'hp' => $mEx[4],
             'order_date_string' => date("d-m-Y H:i:s"),
         ]);
 
+        $total_harga = $product->harga * $mEx[6];
+        $total_berat = $product->berat * $mEx[6];
+        $total_ongkir = null;
+
         //insert to orders
         $payment_method = 1;
         if ($mEx[7] != "Y" && $mEx[7] != "y") {
             $payment_method = 2;
+        } else {
+            //call api get tarif
+            $tarif_response_raw = Http::acceptJson()->asForm()->post('http://apiv2.jne.co.id:10101/tracing/api/pricedev', [
+                'username' => 'TMS',
+                'api_key' => 'dc32eb483f724dd82af7b1754802de5d',
+                'from' => 'TSM30000',
+                'thru' => $destination->TARIFF_CODE,
+                'weight' => $total_berat,
+            ]);
+            $tarif_response = json_decode($tarif_response_raw, true);
+            $collection = collect($tarif_response['price']);
+            $filtered = $collection->whereIn('service_code', ['CTC19', 'REG19']);
+            if (count($filtered) < 1) {
+                return response()->json(new GatewayResource(false, 'Tarif With REG or CTC Not Found', null), 404);
+            }
+            $total_ongkir = $filtered->first()['price'];
         }
-
-        $total_harga = $product->harga * $mEx[6];
-        $total_berat = ($product->berat * $mEx[6]) / 1000;
 
         $order = Order::create([
             'customer_id' => $customer->id,
             'payment_id' => $payment_method,
             'user_id' => 1,
-            'order_status_id' => 1,
+            'order_status_id' => $order_status_id ? $order_status_id : 1,
             'tanggal_pesan_string' => date("d-m-Y H:i:s"),
             'total_harga' => $total_harga,
             'total_berat' => $total_berat,
             'total_pcs' => $mEx[6],
+            'from' => 'TSM30000',
+            'thru' => $destination->TARIFF_CODE,
+            'ongkir' => $total_ongkir,
         ]);
 
         //insert to ordered product
@@ -130,5 +161,22 @@ class GatewayController extends Controller
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment;filename="loader.xlsx"');
         $writer->save('php://output');
+    }
+
+    public function getDestinationByZip(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'kodepos' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $destination = DB::table('jne_destination')->where('ZIP_CODE', $request->kodepos)->first();
+        if ($destination == null) {
+            return response()->json(new GatewayResource(false, 'Destination Not Found', null), 422);
+        }
+        return new GatewayResource(true, 'Destination Found!', $destination);
     }
 }
