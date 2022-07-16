@@ -21,6 +21,7 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
             'hp' => 'required',
+            'from' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -49,6 +50,7 @@ class AuthController extends Controller
             'kota' => $request->kota,
             'provinsi' => $request->provinsi,
             'kodepos' => $request->kodepos,
+            'from' => $request->from,
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -88,6 +90,7 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required|min:6',
             'hp' => 'required',
+            'from' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -116,6 +119,7 @@ class AuthController extends Controller
             'kota' => $request->kota,
             'provinsi' => $request->provinsi,
             'kodepos' => $request->kodepos,
+            'from' => $request->from,
         ]);
         return new UserResource(true, 'Your Profile Successfully Updated!', $user);
     }

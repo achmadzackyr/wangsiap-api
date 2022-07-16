@@ -26,6 +26,7 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
             'hp' => 'required',
+            'from' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -46,6 +47,7 @@ class UserController extends Controller
             'kota' => $request->kota,
             'provinsi' => $request->provinsi,
             'kodepos' => $request->kodepos,
+            'from' => $request->from,
         ]);
 
         return new UserResource(true, 'User Successfully Added!', $user);
@@ -62,6 +64,7 @@ class UserController extends Controller
             'nama' => 'required',
             'email' => 'required|email',
             'hp' => 'required',
+            'from' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -81,6 +84,7 @@ class UserController extends Controller
                 'kota' => $request->kota,
                 'provinsi' => $request->provinsi,
                 'kodepos' => $request->kodepos,
+                'from' => $request->from,
             ]);
             return new UserResource(true, 'User Successfully Updated!', $user);
         } catch (\Illuminate\Database\QueryException$e) {

@@ -30,6 +30,7 @@ class User extends Authenticatable
         'kota',
         'provinsi',
         'kodepos',
+        'from',
     ];
 
     /**
