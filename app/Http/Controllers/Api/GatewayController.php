@@ -67,8 +67,8 @@ class GatewayController extends Controller
         } else {
             //call api get tarif
             $tarif_response_raw = Http::acceptJson()->asForm()->post('http://apiv2.jne.co.id:10101/tracing/api/pricedev', [
-                'username' => 'TMS',
-                'api_key' => 'dc32eb483f724dd82af7b1754802de5d',
+                'username' => env('JNE_USERNAME'),
+                'api_key' => env('JNE_API_KEY'),
                 'from' => 'TSM30000',
                 'thru' => $destination->TARIFF_CODE,
                 'weight' => $total_berat,
@@ -178,5 +178,14 @@ class GatewayController extends Controller
             return response()->json(new GatewayResource(false, 'Destination Not Found', null), 422);
         }
         return new GatewayResource(true, 'Destination Found!', $destination);
+    }
+
+    public function getOrigin()
+    {
+        $origin_response_raw = Http::acceptJson()->asForm()->post('http://apiv2.jne.co.id:10101/insert/getorigin', [
+            'username' => env('JNE_USERNAME'),
+            'api_key' => env('JNE_API_KEY'),
+        ]);
+        return $origin_response = json_decode($origin_response_raw, true);
     }
 }

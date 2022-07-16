@@ -45,5 +45,6 @@ Route::post('/products/getBySku', [ProductController::class, 'getBySku']);
 Route::post('/gateway/order', [GatewayController::class, 'order']);
 Route::post('/gateway/order-list', [GatewayController::class, 'orderList']);
 Route::post('/gateway/get-destination-by-zip', [GatewayController::class, 'getDestinationByZip']);
+Route::post('/gateway/get-origin', [GatewayController::class, 'getOrigin']);
 Route::get('/gateway/downloadLoader', [GatewayController::class, 'downloadLoader']);
 Route::get('/customers/export/all', [CustomerController::class, 'export']);
