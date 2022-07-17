@@ -25,20 +25,28 @@ class UserController extends Controller
             'nama' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'hp' => 'required',
+            'hp' => 'required|unique:users,hp',
             'from' => 'required',
         ]);
 
         if ($validator->fails()) {
             return response()->json(new UserResource(false, $validator->errors(), null), 422);
+        }
 
+        $hp = $request->hp;
+        if ($hp[0] == "0") {
+            $hp = substr($hp, 1);
+        }
+
+        if ($hp[0] == "8") {
+            $hp = "62" . $hp;
         }
 
         $user = User::create([
             'nama' => $request->nama,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'hp' => $request->hp,
+            'hp' => $hp,
             'gender' => $request->gender,
             'jne_id' => $request->jne_id,
             'jne_id_cod' => $request->jne_id_cod,
@@ -71,11 +79,20 @@ class UserController extends Controller
             return response()->json(new UserResource(false, $validator->errors(), null), 422);
         }
 
+        $hp = $request->hp;
+        if ($hp[0] == "0") {
+            $hp = substr($hp, 1);
+        }
+
+        if ($hp[0] == "8") {
+            $hp = "62" . $hp;
+        }
+
         try {
             $user->update([
                 'nama' => $request->nama,
                 'email' => $request->email,
-                'hp' => $request->hp,
+                'hp' => $hp,
                 'gender' => $request->gender,
                 'jne_id' => $request->jne_id,
                 'jne_id_cod' => $request->jne_id_cod,

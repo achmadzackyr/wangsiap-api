@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderedProduct;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -26,12 +27,17 @@ class GatewayController extends Controller
     public function order(Request $request)
     {
         $message = $request->message;
-        $sender = $request->sender;
+        $sender = explode("@", $request->sender, 2)[0];
+        $receiver = explode("@", $request->receiver, 2)[0];
         $order_status_id = $request->order_status_id;
 
         $mEx = explode('#', $message);
 
-        //get user from user_id
+        //get user from to number
+        $user = User::where('hp', $receiver)->first();
+        if ($user == null) {
+            return response()->json(new GatewayResource(false, 'User Not Found', null), 404);
+        }
 
         //search product by sku
         $product = Product::where('sku', $mEx[5])->first();
@@ -85,13 +91,13 @@ class GatewayController extends Controller
         $order = Order::create([
             'customer_id' => $customer->id,
             'payment_id' => $payment_method,
-            'user_id' => 1,
+            'user_id' => $user->id,
             'order_status_id' => $order_status_id ? $order_status_id : 1,
             'tanggal_pesan_string' => date("d-m-Y H:i:s"),
             'total_harga' => $total_harga,
             'total_berat' => $total_berat,
             'total_pcs' => $mEx[6],
-            'from' => 'TSM30000',
+            'from' => $user->from,
             'thru' => $destination->TARIFF_CODE,
             'ongkir' => $total_ongkir,
         ]);
@@ -122,10 +128,13 @@ class GatewayController extends Controller
                 $pecah_belah = "BARANG PECAH BELAH";
             }
 
+            $id_jne = $item->jne_id;
+
             $iscod = "N";
             $hargacod = "";
             if ($item->payment_id == 1) {
                 $iscod = "Y";
+                $id_jne = $item->jne_id_cod;
                 $hargacod = $item->total_harga + $item->ongkir;
             }
 
@@ -133,6 +142,7 @@ class GatewayController extends Controller
             $spreadsheet->getSheetByName('Template Unggah Loader')
                 ->setCellValue('A' . $currentContentRow, $item->nama)
                 ->setCellValue('B' . $currentContentRow, $item->alamat)
+                ->setCellValue('C' . $currentContentRow, $item->kota)
                 ->setCellValue('D' . $currentContentRow, $item->kodepos)
                 ->setCellValue('G' . $currentContentRow, $item->hp)
                 ->setCellValue('H' . $currentContentRow, $item->total_pcs)
@@ -150,7 +160,7 @@ class GatewayController extends Controller
                 ->setCellValue('W' . $currentContentRow, $item->provinsi_pengirim)
                 ->setCellValue('X' . $currentContentRow, $item->nama_pengirim)
                 ->setCellValue('Y' . $currentContentRow, $item->hp_pengirim)
-                ->setCellValue('Z' . $currentContentRow, $item->jne_id);
+                ->setCellValue('Z' . $currentContentRow, $id_jne);
 
             $currentContentRow++;
         }
