@@ -31,7 +31,7 @@ class GatewayController extends Controller
 
         $mEx = explode('#', $message);
 
-        //get user from auth
+        //get user from user_id
 
         //search product by sku
         $product = Product::where('sku', $mEx[5])->first();
@@ -114,7 +114,7 @@ class GatewayController extends Controller
         $contentStartRow = 2;
         $currentContentRow = 2;
 
-        $items = DB::table('today_loader_view')->get();
+        $items = DB::table('all_loader_view')->get();
 
         foreach ($items as $item) {
             $pecah_belah = "General Goods";
@@ -126,7 +126,7 @@ class GatewayController extends Controller
             $hargacod = "";
             if ($item->payment_id == 1) {
                 $iscod = "Y";
-                $hargacod = $item->total_harga;
+                $hargacod = $item->total_harga + $item->ongkir;
             }
 
             $spreadsheet->getSheetByName('Template Unggah Loader')->insertNewRowBefore($currentContentRow + 1, 1);
