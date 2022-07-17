@@ -57,6 +57,7 @@ class GatewayController extends Controller
             'alamat' => $mEx[2],
             'kecamatan' => $destination->DISTRICT_NAME,
             'kota' => $destination->CITY_NAME,
+            'provinsi' => $destination->PROVINCE_NAME,
             'kodepos' => $mEx[3],
             'hp' => $mEx[4],
             'order_date_string' => date("d-m-Y H:i:s"),
@@ -144,7 +145,12 @@ class GatewayController extends Controller
                 ->setCellValue('B' . $currentContentRow, $item->alamat)
                 ->setCellValue('C' . $currentContentRow, $item->kota)
                 ->setCellValue('D' . $currentContentRow, $item->kodepos)
-                ->setCellValue('G' . $currentContentRow, $item->hp)
+                ->setCellValue('E' . $currentContentRow, $item->provinsi)
+                ->setCellValueExplicit(
+                    'G' . $currentContentRow,
+                    $item->hp,
+                    \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING
+                )
                 ->setCellValue('H' . $currentContentRow, $item->total_pcs)
                 ->setCellValue('I' . $currentContentRow, $item->total_berat)
                 ->setCellValue('J' . $currentContentRow, $item->deskripsi)
@@ -159,7 +165,11 @@ class GatewayController extends Controller
                 ->setCellValue('V' . $currentContentRow, $item->kodepos_pengirim)
                 ->setCellValue('W' . $currentContentRow, $item->provinsi_pengirim)
                 ->setCellValue('X' . $currentContentRow, $item->nama_pengirim)
-                ->setCellValue('Y' . $currentContentRow, $item->hp_pengirim)
+                ->setCellValueExplicit(
+                    'Y' . $currentContentRow,
+                    $item->hp_pengirim,
+                    \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING
+                )
                 ->setCellValue('Z' . $currentContentRow, $id_jne);
 
             $currentContentRow++;

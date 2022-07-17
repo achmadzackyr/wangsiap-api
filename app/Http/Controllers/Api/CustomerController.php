@@ -36,6 +36,7 @@ class CustomerController extends Controller
             'alamat' => $request->alamat,
             'kecamatan' => $request->kecamatan,
             'kota' => $request->kota,
+            'provinsi' => $request->provinsi,
             'kodepos' => $request->kodepos,
             'hp' => $request->hp,
             'order_date_string' => date("d-m-Y H:i:s"),
@@ -68,6 +69,7 @@ class CustomerController extends Controller
             'alamat' => $request->alamat,
             'kecamatan' => $request->kecamatan,
             'kota' => $request->kota,
+            'provinsi' => $request->provinsi,
             'kodepos' => $request->kodepos,
             'hp' => $request->hp,
         ]);

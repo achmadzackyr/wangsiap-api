@@ -14,7 +14,8 @@ class CreateAllLoaderView extends Migration
         \DB::statement("
         CREATE VIEW all_loader_view AS
         (
-            SELECT o.tanggal_pesan_string, o.order_status_id, os.order_status, c.nama, c.alamat, c.kecamatan,c.kota, c.kodepos,
+            SELECT o.tanggal_pesan_string, o.order_status_id, os.order_status, c.nama,
+            c.alamat, c.kecamatan, c.kota, c.provinsi, c.kodepos,
             c.hp, o.total_pcs, o.total_berat, p.nama deskripsi, o.ongkir,
             o.total_harga, p.pecah_belah keterangan, o.payment_id, u.jne_id, u.jne_id_cod,
             u.nama nama_pengirim, u.alamat alamat_pengirim, u.kota kota_pengirim,
