@@ -206,10 +206,10 @@ class GatewayController extends Controller
 
         switch ($request->search_by) {
             case 'city':
-                $destination = $destination->where('CITY_NAME', 'like', $request->search_value . '%')->get();
+                $destination = $destination->where('CITY_NAME', 'like', $request->search_value . '%')->orderBy('PROVINCE_NAME')->get();
                 break;
             default:
-                $destination = $destination->where('DISTRICT_NAME', 'like', $request->search_value . '%')->get();
+                $destination = $destination->where('DISTRICT_NAME', 'like', $request->search_value . '%')->orderBy('PROVINCE_NAME')->get();
                 break;
         }
 
