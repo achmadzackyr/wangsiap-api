@@ -44,7 +44,8 @@ Route::post('/wa-sessions/set-session/{wa_session}', [WaSessionController::class
 Route::post('/products/getBySku', [ProductController::class, 'getBySku']);
 Route::post('/gateway/order', [GatewayController::class, 'order']);
 Route::post('/gateway/order-list', [GatewayController::class, 'orderList']);
-Route::post('/gateway/get-destination-by-zip', [GatewayController::class, 'getDestinationByZip']);
+Route::post('/gateway/get-destinations-by-zip', [GatewayController::class, 'getDestinationsByZip']);
+Route::post('/gateway/get-zip-by-destination', [GatewayController::class, 'getZipByDestination']);
 Route::post('/gateway/get-origin', [GatewayController::class, 'getOrigin']);
 Route::get('/gateway/downloadLoader', [GatewayController::class, 'downloadLoader']);
 Route::get('/customers/export/all', [CustomerController::class, 'export']);

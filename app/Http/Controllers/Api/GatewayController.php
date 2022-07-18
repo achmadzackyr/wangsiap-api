@@ -55,7 +55,7 @@ class GatewayController extends Controller
             'customer_status_id' => 1,
             'nama' => $mEx[1],
             'alamat' => $mEx[2],
-            'kecamatan' => $destination->DISTRICT_NAME,
+            //'kecamatan' => $destination->DISTRICT_NAME,
             'kota' => $destination->CITY_NAME,
             'provinsi' => $destination->PROVINCE_NAME,
             'kodepos' => $mEx[3],
@@ -183,7 +183,7 @@ class GatewayController extends Controller
         $writer->save('php://output');
     }
 
-    public function getDestinationByZip(Request $request)
+    public function getDestinationsByZip(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'kodepos' => 'required',
@@ -193,7 +193,26 @@ class GatewayController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        $destination = DB::table('jne_destination')->where('ZIP_CODE', $request->kodepos)->first();
+        $destination = DB::table('jne_destination')->where('ZIP_CODE', $request->kodepos)->get();
+        if ($destination == null) {
+            return response()->json(new GatewayResource(false, 'Destination Not Found', null), 422);
+        }
+        return new GatewayResource(true, 'Destination Found!', $destination);
+    }
+
+    public function getZipByDestination(Request $request)
+    {
+        $destination = DB::table('jne_destination');
+
+        switch ($request->search_by) {
+            case 'city':
+                $destination = $destination->where('CITY_NAME', 'like', $request->search_value . '%')->get();
+                break;
+            default:
+                $destination = $destination->where('DISTRICT_NAME', 'like', $request->search_value . '%')->get();
+                break;
+        }
+
         if ($destination == null) {
             return response()->json(new GatewayResource(false, 'Destination Not Found', null), 422);
         }
