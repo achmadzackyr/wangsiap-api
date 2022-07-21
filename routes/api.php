@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\CustomerStatusController;
 use App\Http\Controllers\Api\GatewayController;
+use App\Http\Controllers\Api\LogController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OrderedProductController;
 use App\Http\Controllers\Api\OrderStatusController;
@@ -38,7 +39,9 @@ Route::apiResource('/order-status', OrderStatusController::class);
 Route::apiResource('/products', ProductController::class);
 Route::apiResource('/users', UserController::class);
 Route::apiResource('/wa-sessions', WaSessionController::class);
+Route::apiResource('/logs', LogController::class);
 
+Route::post('/users/get-user-by-phone', [UserController::class, 'getUserByPhone']);
 Route::post('/wa-sessions/get-by-user-id', [WaSessionController::class, 'getByUserId']);
 Route::post('/wa-sessions/set-session/{wa_session}', [WaSessionController::class, 'setSession']);
 Route::post('/products/getBySku', [ProductController::class, 'getBySku']);

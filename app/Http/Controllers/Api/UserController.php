@@ -118,6 +118,32 @@ class UserController extends Controller
         return new UserResource(true, 'User Successfully Deleted!', null);
     }
 
+    public function getUserByPhone(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'hp' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $hp = $request->hp;
+        if ($hp[0] == "0") {
+            $hp = substr($hp, 1);
+        }
+
+        if ($hp[0] == "8") {
+            $hp = "62" . $hp;
+        }
+
+        $user = User::where('hp', $hp)->first();
+        if ($user == null) {
+            return response()->json(new UserResource(false, 'User Not Found', null), 422);
+        }
+        return new UserResource(true, 'User Found!', $user);
+    }
+
     // public function export()
     // {
     //     return Excel::download(new UsersExport, 'Users.xlsx');
