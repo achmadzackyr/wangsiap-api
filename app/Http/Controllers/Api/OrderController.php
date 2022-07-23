@@ -122,7 +122,7 @@ class OrderController extends Controller
 
         $order = Order::where('no_pengirim', $hp)->latest()->first();
         if ($order == null || $order->order_status_id != 1) {
-            return response()->json(new OrderResource(false, 'Order not found', null), 404);
+            return new OrderResource(false, 'Order not found', null);
         }
         //check if expire max 60 min
         $now = \Carbon\Carbon::now();
@@ -134,9 +134,9 @@ class OrderController extends Controller
         } else {
             //check if still 24 hours
             if ($diff_in_minutes <= 1440) {
-                return response()->json(new OrderResource(false, 'Order is expire', null), 500);
+                return new OrderResource(false, 'Order expired', null);
             } else {
-                return response()->json(new OrderResource(false, 'Order not found', null), 404);
+                return new OrderResource(false, 'Order not found', null);
             }
         }
     }
