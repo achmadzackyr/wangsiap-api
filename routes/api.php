@@ -52,3 +52,5 @@ Route::post('/gateway/get-zip-by-destination', [GatewayController::class, 'getZi
 Route::post('/gateway/get-origin', [GatewayController::class, 'getOrigin']);
 Route::get('/gateway/downloadLoader', [GatewayController::class, 'downloadLoader']);
 Route::get('/customers/export/all', [CustomerController::class, 'export']);
+Route::post('/orders/get-latest-by-sender', [OrderController::class, 'getLatestOrderBySender']);
+Route::put('/orders/update-status/{order}', [OrderController::class, 'updateStatus']);

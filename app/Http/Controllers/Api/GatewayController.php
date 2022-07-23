@@ -101,6 +101,8 @@ class GatewayController extends Controller
             'from' => $user->from,
             'thru' => $destination->TARIFF_CODE,
             'ongkir' => $total_ongkir,
+            'no_pengirim' => $sender,
+            'no_penerima' => $receiver,
         ]);
 
         //insert to ordered product

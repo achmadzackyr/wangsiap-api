@@ -25,6 +25,8 @@ class OrderController extends Controller
             'total_harga' => 'required',
             'total_berat' => 'required',
             'total_pcs' => 'required',
+            'no_pengirim' => 'required',
+            'no_penerima' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -41,6 +43,8 @@ class OrderController extends Controller
             'total_harga' => $request->total_harga,
             'total_berat' => $request->total_berat,
             'total_pcs' => $request->total_pcs,
+            'no_pengirim' => $request->no_pengirim,
+            'no_penerima' => $request->no_penerima,
         ]);
 
         return new OrderResource(true, 'Order Successfully Added!', $order);
@@ -102,5 +106,62 @@ class OrderController extends Controller
     {
         $order->delete();
         return new OrderResource(true, 'Order Successfully Deleted!', null);
+    }
+
+    public function getLatestOrderBySender(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'no_pengirim' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $hp = $request->no_pengirim;
+        if ($hp[0] == "0") {
+            $hp = substr($hp, 1);
+        }
+
+        if ($hp[0] == "8") {
+            $hp = "62" . $hp;
+        }
+
+        $order = Order::where('no_pengirim', $hp)->latest()->first();
+        if ($order == null || $order->order_status_id != 1) {
+            return response()->json(new OrderResource(false, 'Order not found', null), 404);
+        }
+        //check if expire max 60 min
+        $now = \Carbon\Carbon::now();
+        $created_date = \Carbon\Carbon::createFromFormat('Y-m-d H:s:i', $order->created_at);
+
+        $diff_in_minutes = $now->diffInMinutes($created_date);
+        if ($diff_in_minutes <= 60) {
+            return new OrderResource(true, 'Order found!', $order);
+        } else {
+            //check if still 24 hours
+            if ($diff_in_minutes <= 1440) {
+                return response()->json(new OrderResource(false, 'Order is expire', null), 500);
+            } else {
+                return response()->json(new OrderResource(false, 'Order not found', null), 404);
+            }
+        }
+    }
+
+    public function updateStatus(Request $request, Order $order)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_status_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $order->update([
+            'order_status_id' => $request->order_status_id,
+        ]);
+
+        return new OrderResource(true, 'Order Successfully Updated!', $order);
     }
 }
