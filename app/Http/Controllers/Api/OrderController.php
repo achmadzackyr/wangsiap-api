@@ -118,14 +118,7 @@ class OrderController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        $hp = $request->no_pengirim;
-        if ($hp[0] == "0") {
-            $hp = substr($hp, 1);
-        }
-
-        if ($hp[0] == "8") {
-            $hp = "62" . $hp;
-        }
+        $hp = explode("@", $request->no_pengirim, 2)[0];
 
         $order = Order::where('no_pengirim', $hp)->latest()->first();
         if ($order == null || $order->order_status_id != 1) {
