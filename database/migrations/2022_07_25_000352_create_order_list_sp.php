@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up()
     {
-        $procedure = "DROP PROCEDURE IF EXISTS `generate_loader`;
-            CREATE PROCEDURE `generate_loader`(
+        $procedure = "DROP PROCEDURE IF EXISTS `order_list`;
+            CREATE PROCEDURE `order_list`(
                 order_status_id_param INTEGER(1),
                 no_penerima_param VARCHAR(25),
                 date_from_param VARCHAR(50),
-                date_to_param VARCHAR(50)
+                date_to_param VARCHAR(50),
+                limit_param INTEGER(100),
+                offset_param INTEGER(200)
             )
             BEGIN
                     SELECT
@@ -45,7 +47,9 @@ return new class extends Migration
                       `u`.`kodepos`              AS `kodepos_pengirim`,
                       `u`.`provinsi`             AS `provinsi_pengirim`,
                       `u`.`hp`                   AS `hp_pengirim`,
-                      `o`.`created_at`           AS `created_at`
+                      `o`.`created_at`           AS `created_at`,
+                      (SELECT COUNT(id) FROM orders WHERE order_status_id = order_status_id_param COLLATE utf8mb4_unicode_ci AND no_penerima = no_penerima_param COLLATE utf8mb4_unicode_ci
+                         AND created_at >= date_from_param COLLATE utf8mb4_unicode_ci AND created_at <= date_to_param COLLATE utf8mb4_unicode_ci)           AS `total_row`
                     FROM (((((`customers` `c`
                            LEFT JOIN `orders` `o`
                          ON ((`c`.`id` = `o`.`customer_id`)))
@@ -59,7 +63,7 @@ return new class extends Migration
                          ON ((`u`.`id` = `o`.`user_id`)))
                          WHERE o.order_status_id = order_status_id_param COLLATE utf8mb4_unicode_ci AND o.no_penerima = no_penerima_param COLLATE utf8mb4_unicode_ci
                          AND o.created_at >= date_from_param COLLATE utf8mb4_unicode_ci AND o.created_at <= date_to_param COLLATE utf8mb4_unicode_ci
-                    ORDER BY `o`.`created_at` DESC;
+                    ORDER BY `o`.`created_at` DESC LIMIT limit_param OFFSET offset_param;
                 END;
             ";
 

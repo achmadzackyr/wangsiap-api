@@ -25,6 +25,8 @@ class GatewayController extends Controller
             'no_penerima' => 'required',
             'date_from' => 'required',
             'date_to' => 'required',
+            'page' => 'required',
+            'per_page' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -34,13 +36,13 @@ class GatewayController extends Controller
         $dateFrom = date_format(date_create(request()->date_from), "Y-m-d") . " 00:00:00";
         $dateTo = date_format(date_create(request()->date_to), "Y-m-d") . " 23:59:59";
 
-        $data = DB::select('CALL generate_loader(?,?,?,?)', [$request->order_status_id, $request->no_penerima, $dateFrom, $dateTo]);
-        $page = \Illuminate\Support\Facades\Request::input('page', 1);
-        $paginate = $request->per_page ? $request->per_page : 10;
+        $per_page = $request->per_page ? $request->per_page : 10;
+        $page = $request->page ? (($request->page - 1) * $per_page) : 0;
+        $data = DB::select('CALL order_list(?,?,?,?,?,?)', [$request->order_status_id, $request->no_penerima, $dateFrom, $dateTo, $per_page, $page]);
 
-        $offSet = ($page * $paginate) - $paginate;
-        $itemsForCurrentPage = array_slice($data, $offSet, $paginate, true);
-        $data = new \Illuminate\Pagination\LengthAwarePaginator($itemsForCurrentPage, count($data), $paginate, $page);
+        // $offSet = ($page * $paginate) - $paginate;
+        // $itemsForCurrentPage = array_slice($data, $offSet, $paginate, true);
+        // $data = new \Illuminate\Pagination\LengthAwarePaginator($itemsForCurrentPage, count($data), $paginate, $page);
         return new GatewayResource(true, 'Order Successfully Loaded!', $data);
     }
 
