@@ -50,7 +50,7 @@ Route::post('/gateway/order-list', [GatewayController::class, 'orderList']);
 Route::post('/gateway/get-destinations-by-zip', [GatewayController::class, 'getDestinationsByZip']);
 Route::post('/gateway/get-zip-by-destination', [GatewayController::class, 'getZipByDestination']);
 Route::post('/gateway/get-origin', [GatewayController::class, 'getOrigin']);
-Route::get('/gateway/downloadLoader', [GatewayController::class, 'downloadLoader']);
+Route::post('/gateway/downloadLoader', [GatewayController::class, 'downloadLoader']);
 Route::get('/customers/export/all', [CustomerController::class, 'export']);
 Route::post('/orders/get-latest-by-sender', [OrderController::class, 'getLatestOrderBySender']);
 Route::put('/orders/update-status/{order}', [OrderController::class, 'updateStatus']);

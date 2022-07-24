@@ -20,8 +20,28 @@ class GatewayController extends Controller
 {
     public function orderList(Request $request)
     {
-        $items = DB::table('all_loader_view')->where('order_status_id', '1')->paginate(10);
-        return new GatewayResource(true, 'Order Successfully Loaded!', $items);
+        $validator = Validator::make($request->all(), [
+            'order_status_id' => 'required',
+            'no_penerima' => 'required',
+            'date_from' => 'required',
+            'date_to' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $dateFrom = date_format(date_create(request()->date_from), "Y-m-d") . " 00:00:00";
+        $dateTo = date_format(date_create(request()->date_to), "Y-m-d") . " 23:59:59";
+
+        $data = DB::select('CALL generate_loader(?,?,?,?)', [$request->order_status_id, $request->no_penerima, $dateFrom, $dateTo]);
+        $page = \Illuminate\Support\Facades\Request::input('page', 1);
+        $paginate = $request->per_page ? $request->per_page : 10;
+
+        $offSet = ($page * $paginate) - $paginate;
+        $itemsForCurrentPage = array_slice($data, $offSet, $paginate, true);
+        $data = new \Illuminate\Pagination\LengthAwarePaginator($itemsForCurrentPage, count($data), $paginate, $page);
+        return new GatewayResource(true, 'Order Successfully Loaded!', $data);
     }
 
     public function order(Request $request)
@@ -116,6 +136,20 @@ class GatewayController extends Controller
 
     public function downloadLoader(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'order_status_id' => 'required',
+            'no_penerima' => 'required',
+            'date_from' => 'required',
+            'date_to' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $dateFrom = date_format(date_create(request()->date_from), "Y-m-d") . " 00:00:00";
+        $dateTo = date_format(date_create(request()->date_to), "Y-m-d") . " 23:59:59";
+
         header('Access-Control-Allow-Origin: *');
         $reader = IOFactory::createReader('Xlsx');
         $spreadsheet = $reader->load("../resources/template/template-loader-jne.xlsx");
@@ -123,7 +157,7 @@ class GatewayController extends Controller
         $contentStartRow = 2;
         $currentContentRow = 2;
 
-        $items = DB::table('all_loader_view')->get();
+        $items = DB::select('CALL generate_loader(?,?,?,?)', [$request->order_status_id, $request->no_penerima, $dateFrom, $dateTo]);
 
         foreach ($items as $item) {
             $pecah_belah = "General Goods";
