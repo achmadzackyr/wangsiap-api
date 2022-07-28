@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\OrderDetailResource;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -156,5 +157,26 @@ class OrderController extends Controller
         ]);
 
         return new OrderResource(true, 'Order Successfully Updated!', $order);
+    }
+
+    public function getOrderDetail(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $order = Order::find($request->order_id);
+        if ($order == null) {
+            return new OrderResource(false, 'Order not found', null);
+        }
+
+        $customer = $order->customer()->first();
+        $ordered_product = $order->ordered_products()->get();
+
+        return new OrderDetailResource($order, $customer, $ordered_product);
     }
 }
