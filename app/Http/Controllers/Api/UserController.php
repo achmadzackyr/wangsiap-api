@@ -137,6 +137,8 @@ class UserController extends Controller
             $hp = "62" . $hp;
         }
 
+        $hp = explode("@", $hp, 2)[0];
+
         $user = User::where('hp', $hp)->first();
         if ($user == null) {
             return response()->json(new UserResource(false, 'User Not Found', null), 422);

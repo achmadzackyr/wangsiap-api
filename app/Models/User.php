@@ -72,4 +72,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(WaSession::class);
     }
+
+    public function customers()
+    {
+        return $this->hasMany(Customer::class);
+    }
 }

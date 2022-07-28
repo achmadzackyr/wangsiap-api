@@ -22,6 +22,9 @@ return new class extends Migration
             )
             BEGIN
                     SELECT
+                      `o`.`id` 			             AS `order_id`,
+		                  `c`.`id` 			             AS `customer_id`,
+		                  `op`.`id` 		             AS `ordered_product_id`,
                       `o`.`tanggal_pesan_string` AS `tanggal_pesan_string`,
                       `o`.`order_status_id`      AS `order_status_id`,
                       `os`.`order_status`        AS `order_status`,

@@ -61,8 +61,8 @@ class GatewayController extends Controller
             return response()->json(new GatewayResource(false, 'User Not Found', null), 404);
         }
 
-        //search product by sku
-        $product = Product::where('sku', $mEx[5])->first();
+        //search product by sku per user
+        $product = Product::where('sku', $mEx[5])->where('user_id', $user->id)->first();
         if ($product == null) {
             return response()->json(new GatewayResource(false, 'Product Not Found', null), 404);
         }
@@ -83,6 +83,7 @@ class GatewayController extends Controller
             'kodepos' => $mEx[3],
             'hp' => $mEx[4],
             'order_date_string' => date("d-m-Y H:i:s"),
+            'user_id' => $user->id,
         ]);
 
         $total_harga = $product->harga * $mEx[6];

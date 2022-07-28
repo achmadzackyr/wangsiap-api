@@ -6,6 +6,7 @@ use App\Exports\CustomersExport;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
@@ -25,6 +26,7 @@ class CustomerController extends Controller
             'alamat' => 'required',
             'kodepos' => 'required',
             'hp' => 'required',
+            'user_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -32,6 +34,7 @@ class CustomerController extends Controller
         }
 
         $customer = Customer::create([
+            'user_id' => $request->user_id,
             'nama' => $request->nama,
             'alamat' => $request->alamat,
             'kecamatan' => $request->kecamatan,
@@ -86,5 +89,12 @@ class CustomerController extends Controller
     {
 
         return Excel::download(new CustomersExport, 'customers.xlsx');
+    }
+
+    public function getMyCustomer()
+    {
+        $user = Auth::user();
+        $customers = Customer::where('user_id', $user->id)->latest()->paginate(10);
+        return new CustomerResource(true, 'List Data Customers', $customers);
     }
 }

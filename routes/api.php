@@ -26,8 +26,12 @@ Route::controller(AuthController::class)->group(function () {
             Route::post('/', 'update');
         });
         Route::post('/auth/logout', 'logout');
+        Route::post('/products/get-my-product', [ProductController::class, 'getMyProduct']);
+        Route::post('/products/store-my-product', [ProductController::class, 'storeMyProduct']);
+        Route::post('/products/check-my-sku', [ProductController::class, 'checkMySku']);
+        Route::post('/products/get-my-product-detail', [ProductController::class, 'getByProductDetail']);
+        Route::post('/customers/get-my-customer', [CustomerController::class, 'getMyCustomer']);
     });
-
 });
 
 Route::apiResource('/customers', CustomerController::class);
