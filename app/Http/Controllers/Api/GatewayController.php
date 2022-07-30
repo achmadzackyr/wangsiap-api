@@ -274,4 +274,16 @@ class GatewayController extends Controller
         ]);
         return $origin_response = json_decode($origin_response_raw, true);
     }
+
+    public function getTarif(Request $request)
+    {
+        $tarif_response_raw = Http::acceptJson()->asForm()->post('http://apiv2.jne.co.id:10101/tracing/api/pricedev', [
+            'username' => env('JNE_USERNAME'),
+            'api_key' => env('JNE_API_KEY'),
+            'from' => $request->from,
+            'thru' => $request->thru,
+            'weight' => $request->weight,
+        ]);
+        return $tarif_response = json_decode($tarif_response_raw, true);
+    }
 }
