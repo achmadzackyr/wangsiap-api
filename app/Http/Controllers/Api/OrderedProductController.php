@@ -67,4 +67,21 @@ class OrderedProductController extends Controller
         $orderedProduct->delete();
         return new OrderedProductResource(true, 'Ordered Product Successfully Deleted!', null);
     }
+
+    public function getByOrderId(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(new OrderedProductResource(false, $validator->errors(), null), 422);
+        }
+
+        $orderedProduct = OrderedProduct::where('order_id', $request->order_id)->get();
+        if ($orderedProduct == null) {
+            return response()->json(new OrderedProductResource(false, 'Product Not Found', null), 422);
+        }
+        return new OrderedProductResource(true, 'Product Found', $orderedProduct);
+    }
 }

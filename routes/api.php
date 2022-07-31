@@ -60,3 +60,4 @@ Route::get('/customers/export/all', [CustomerController::class, 'export']);
 Route::post('/orders/get-latest-by-sender', [OrderController::class, 'getLatestOrderBySender']);
 Route::put('/orders/update-status/{order}', [OrderController::class, 'updateStatus']);
 Route::post('/orders/get-order-detail', [OrderController::class, 'getOrderDetail']);
+Route::post('/ordered-products/get-by-order', [OrderedProductController::class, 'getByOrderId']);
