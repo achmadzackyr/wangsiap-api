@@ -66,6 +66,10 @@ class OrderController extends Controller
             'total_harga' => 'required',
             'total_berat' => 'required',
             'total_pcs' => 'required',
+            'from' => 'required',
+            'thru' => 'required',
+            'ongkir' => 'required',
+            'no_pengirim' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -82,6 +86,10 @@ class OrderController extends Controller
                     'total_berat' => $request->total_berat,
                     'total_pcs' => $request->total_pcs,
                     'awb' => $request->awb,
+                    'from' => $request->from,
+                    'thru' => $request->thru,
+                    'ongkir' => $request->ongkir,
+                    'no_pengirim' => $request->no_pengirim,
                 ]);
             } else {
                 $order->update([
@@ -92,6 +100,10 @@ class OrderController extends Controller
                     'total_harga' => $request->total_harga,
                     'total_berat' => $request->total_berat,
                     'total_pcs' => $request->total_pcs,
+                    'from' => $request->from,
+                    'thru' => $request->thru,
+                    'ongkir' => $request->ongkir,
+                    'no_pengirim' => $request->no_pengirim,
                 ]);
             }
             return new OrderResource(true, 'Order Successfully Updated!', $order);
