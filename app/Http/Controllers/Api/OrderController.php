@@ -69,7 +69,6 @@ class OrderController extends Controller
             'from' => 'required',
             'thru' => 'required',
             'ongkir' => 'required',
-            'no_pengirim' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -89,7 +88,6 @@ class OrderController extends Controller
                     'from' => $request->from,
                     'thru' => $request->thru,
                     'ongkir' => $request->ongkir,
-                    'no_pengirim' => $request->no_pengirim,
                 ]);
             } else {
                 $order->update([
@@ -103,7 +101,6 @@ class OrderController extends Controller
                     'from' => $request->from,
                     'thru' => $request->thru,
                     'ongkir' => $request->ongkir,
-                    'no_pengirim' => $request->no_pengirim,
                 ]);
             }
             return new OrderResource(true, 'Order Successfully Updated!', $order);
