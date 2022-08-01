@@ -61,3 +61,4 @@ Route::post('/orders/get-latest-by-sender', [OrderController::class, 'getLatestO
 Route::put('/orders/update-status/{order}', [OrderController::class, 'updateStatus']);
 Route::post('/orders/get-order-detail', [OrderController::class, 'getOrderDetail']);
 Route::post('/ordered-products/get-by-order', [OrderedProductController::class, 'getByOrderId']);
+Route::post('/ordered-products/update-by-order', [OrderedProductController::class, 'updateByOrderId']);

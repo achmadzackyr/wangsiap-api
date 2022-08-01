@@ -84,4 +84,28 @@ class OrderedProductController extends Controller
         }
         return new OrderedProductResource(true, 'Product Found', $orderedProduct);
     }
+
+    public function updateByOrderId(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => 'required',
+            'product_id' => 'required',
+            'pcs' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(new OrderedProductResource(false, $validator->errors(), null), 422);
+        }
+
+        $orderedProducts = OrderedProduct::where('order_id', $request->order_id)->delete();
+
+        //Loop request
+        $orderedProduct = OrderedProduct::create([
+            'order_id' => $request->order_id,
+            'product_id' => $request->product_id,
+            'pcs' => $request->pcs,
+        ]);
+
+        return new OrderedProductResource(true, 'Ordered Product Successfully Added!', $orderedProduct);
+    }
 }
