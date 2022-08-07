@@ -212,7 +212,7 @@ class GatewayController extends Controller
                 ->setCellValueExplicit(
                     'Z' . $currentContentRow,
                     $id_jne,
-                    \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMBER
+                    \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC
                 );
 
             $currentContentRow++;
