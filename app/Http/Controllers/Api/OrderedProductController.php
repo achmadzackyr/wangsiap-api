@@ -106,6 +106,6 @@ class OrderedProductController extends Controller
             'pcs' => $request->pcs,
         ]);
 
-        return new OrderedProductResource(true, 'Ordered Product Successfully Added!', $orderedProduct);
+        return new OrderedProductResource(true, 'Ordered Product Successfully Updated!', $orderedProduct);
     }
 }

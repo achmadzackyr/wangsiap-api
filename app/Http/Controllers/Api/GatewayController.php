@@ -99,13 +99,13 @@ class GatewayController extends Controller
             $tarif_response_raw = Http::acceptJson()->asForm()->post('http://apiv2.jne.co.id:10101/tracing/api/pricedev', [
                 'username' => env('JNE_USERNAME'),
                 'api_key' => env('JNE_API_KEY'),
-                'from' => 'TSM30000',
+                'from' => $user->from,
                 'thru' => $destination->TARIFF_CODE,
                 'weight' => $total_berat,
             ]);
             $tarif_response = json_decode($tarif_response_raw, true);
             $collection = collect($tarif_response['price']);
-            $filtered = $collection->whereIn('service_code', ['CTC19', 'REG19']);
+            $filtered = $collection->whereIn('service_display', ['CTC', 'REG']);
             if (count($filtered) < 1) {
                 return response()->json(new GatewayResource(false, 'Tarif With REG or CTC Not Found', null), 404);
             }
@@ -190,9 +190,9 @@ class GatewayController extends Controller
                     $item->hp,
                     \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING
                 )
-                ->setCellValue('H' . $currentContentRow, $item->total_pcs)
+                ->setCellValue('H' . $currentContentRow, '1')
                 ->setCellValue('I' . $currentContentRow, $item->total_berat)
-                ->setCellValue('J' . $currentContentRow, $item->deskripsi)
+                ->setCellValue('J' . $currentContentRow, $item->deskripsi . ' ' . $item->total_pcs)
                 ->setCellValue('K' . $currentContentRow, $item->total_harga)
                 ->setCellValue('L' . $currentContentRow, $pecah_belah)
                 ->setCellValue('M' . $currentContentRow, 'REG')
@@ -209,7 +209,11 @@ class GatewayController extends Controller
                     $item->hp_pengirim,
                     \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING
                 )
-                ->setCellValue('Z' . $currentContentRow, $id_jne);
+                ->setCellValueExplicit(
+                    'Z' . $currentContentRow,
+                    $id_jne,
+                    \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMBER
+                );
 
             $currentContentRow++;
         }
