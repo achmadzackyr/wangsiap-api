@@ -28,10 +28,12 @@ class EmployeeController extends Controller
             return response()->json(new CommonResource(false, 'Employee Not Found', null), 422);
         }
 
+        //Check employee is a user
+
         $manager = $request->user();
         $encrypted = Crypt::encryptString($manager->id . '|' . $request->employee_id);
 
-        $msg = "Kamu ditambahkan sebagai CS oleh " . $manager->nama . ". Klik link berikut untuk menyetujuinya http://localhost:8075/api/employees/approve-cs/" . $encrypted;
+        $msg = "Kamu ditambahkan sebagai CS oleh " . $manager->nama . ". Klik link berikut untuk menyetujuinya https://api.wangsiap.com/api/employees/approve-cs/" . $encrypted;
 
         $encoded = json_encode('{"receiver": "' . $employee->hp . '", "message": {"text": "' . $msg . '"}}');
         $decoded = json_decode($encoded, true);
