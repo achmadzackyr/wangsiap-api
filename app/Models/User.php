@@ -77,4 +77,24 @@ class User extends Authenticatable
     {
         return $this->hasMany(Customer::class);
     }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    public function subscription()
+    {
+        return $this->belongsTo(Subscription::class, 'subscription_id');
+    }
+
+    public function managers()
+    {
+        return $this->hasMany(Employee::class);
+    }
+
+    public function employees()
+    {
+        return $this->hasMany(Employee::class);
+    }
 }

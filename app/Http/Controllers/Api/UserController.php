@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 //use App\Exports\UsersExport;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -144,6 +145,36 @@ class UserController extends Controller
             return response()->json(new UserResource(false, 'User Not Found', null), 422);
         }
         return new UserResource(true, 'User Found!', $user);
+    }
+
+    public function assignRole(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required',
+            'role_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $role = Role::find($request->role_id);
+        if ($role == null) {
+            return response()->json(new UserResource(false, 'Role Not Found', null), 422);
+        }
+
+        $user = User::whereId($request->user_id);
+
+        if ($user->first() != null) {
+            $user->update([
+                'role_id' => $request->role_id,
+            ]);
+            $user->first()->tokens()->delete();
+            $user->first()->createToken('auth_token', [$role->nama]);
+            return new UserResource(true, 'Role Has Been Assigned', $user);
+        } else {
+            return response()->json(new UserResource(false, 'Failed to Assign Role', null), 401);
+        }
     }
 
     // public function export()

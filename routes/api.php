@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\CustomerStatusController;
+use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\GatewayController;
 use App\Http\Controllers\Api\LogController;
 use App\Http\Controllers\Api\OrderController;
@@ -10,6 +11,8 @@ use App\Http\Controllers\Api\OrderedProductController;
 use App\Http\Controllers\Api\OrderStatusController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\WaSessionController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +34,11 @@ Route::controller(AuthController::class)->group(function () {
         Route::post('/products/check-my-sku', [ProductController::class, 'checkMySku']);
         Route::post('/products/get-my-product-detail', [ProductController::class, 'getByProductDetail']);
         Route::post('/customers/get-my-customer', [CustomerController::class, 'getMyCustomer']);
+        Route::post('/users/assign-role', [UserController::class, 'assignRole']);
+        Route::post('/employees/cs-confrim', [EmployeeController::class, 'sendCsConfirmation']);
+
+        Route::apiResource('/subscriptions', SubscriptionController::class);
+        Route::apiResource('/roles', RoleController::class);
     });
 });
 
@@ -45,6 +53,7 @@ Route::apiResource('/users', UserController::class);
 Route::apiResource('/wa-sessions', WaSessionController::class);
 Route::apiResource('/logs', LogController::class);
 
+Route::get('/employees/approve-cs/{token}', [EmployeeController::class, 'approveCs']);
 Route::post('/users/get-user-by-phone', [UserController::class, 'getUserByPhone']);
 Route::post('/wa-sessions/get-by-user-id', [WaSessionController::class, 'getByUserId']);
 Route::post('/wa-sessions/set-session/{wa_session}', [WaSessionController::class, 'setSession']);

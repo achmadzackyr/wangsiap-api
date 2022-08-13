@@ -37,7 +37,7 @@ return new class extends Migration
                       `c`.`hp`                   AS `hp`,
                       `o`.`total_pcs`            AS `total_pcs`,
                       `o`.`total_berat`          AS `total_berat`,
-                      `p`.`nama`                 AS `deskripsi`,
+                      `p`.`deskripsi`            AS `deskripsi`,
                       `o`.`ongkir`               AS `ongkir`,
                       `o`.`total_harga`          AS `total_harga`,
                       `p`.`pecah_belah`          AS `keterangan`,

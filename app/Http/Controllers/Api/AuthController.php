@@ -51,9 +51,10 @@ class AuthController extends Controller
             'provinsi' => $request->provinsi,
             'kodepos' => $request->kodepos,
             'from' => $request->from,
+            'role_id' => 2,
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken('auth_token', ['user'])->plainTextToken;
         $user->token = $token;
 
         return new UserResource(true, 'User Successfully Added!', $user);
