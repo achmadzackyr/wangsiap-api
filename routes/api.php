@@ -11,9 +11,12 @@ use App\Http\Controllers\Api\OrderedProductController;
 use App\Http\Controllers\Api\OrderStatusController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\ReplyController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\SubscriptionController;
+use App\Http\Controllers\Api\TemplateController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\UserTemplateController;
 use App\Http\Controllers\Api\WaSessionController;
 use Illuminate\Support\Facades\Route;
 
@@ -37,8 +40,18 @@ Route::controller(AuthController::class)->group(function () {
         Route::post('/users/assign-role', [UserController::class, 'assignRole']);
         Route::post('/employees/cs-confrim', [EmployeeController::class, 'sendCsConfirmation']);
 
+        Route::post('/replies/get', [ReplyController::class, 'get']);
+        Route::post('/replies/get-reply', [ReplyController::class, 'getReply']);
+        Route::post('/replies/add', [ReplyController::class, 'store']);
+        Route::post('/replies/update', [ReplyController::class, 'update']);
+        Route::post('/replies/delete', [ReplyController::class, 'delete']);
+        Route::post('/replies/list', [ReplyController::class, 'list']);
+        Route::post('/user-templates/get-reply', [UserTemplateController::class, 'getReply']);
+
         Route::apiResource('/subscriptions', SubscriptionController::class);
         Route::apiResource('/roles', RoleController::class);
+        Route::apiResource('/templates', TemplateController::class);
+        Route::apiResource('/user-templates', UserTemplateController::class);
     });
 });
 
@@ -65,6 +78,8 @@ Route::post('/gateway/get-zip-by-destination', [GatewayController::class, 'getZi
 Route::post('/gateway/get-origin', [GatewayController::class, 'getOrigin']);
 Route::post('/gateway/get-tarif', [GatewayController::class, 'getTarif']);
 Route::post('/gateway/downloadLoader', [GatewayController::class, 'downloadLoader']);
+Route::post('/gateway/orderx', [GatewayController::class, 'orderx']);
+Route::post('/gateway/orderfull', [GatewayController::class, 'orderFull']);
 Route::get('/customers/export/all', [CustomerController::class, 'export']);
 Route::post('/orders/get-latest-by-sender', [OrderController::class, 'getLatestOrderBySender']);
 Route::put('/orders/update-status/{order}', [OrderController::class, 'updateStatus']);

@@ -4,16 +4,18 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CommonResource;
+use App\Http\Traits\WhatsappTrait;
 use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 
 class EmployeeController extends Controller
 {
+    use WhatsappTrait;
+
     public function sendCsConfirmation(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -34,15 +36,7 @@ class EmployeeController extends Controller
         $encrypted = Crypt::encryptString($manager->id . '|' . $request->employee_id);
 
         $msg = "Kamu ditambahkan sebagai CS oleh " . $manager->nama . ". Klik link berikut untuk menyetujuinya https://api.wangsiap.com/api/employees/approve-cs/" . $encrypted;
-
-        $encoded = json_encode('{"receiver": "' . $employee->hp . '", "message": {"text": "' . $msg . '"}}');
-        $decoded = json_decode($encoded, true);
-        $response = Http::withBody($decoded, 'application/json')
-            ->post('https://wagw.wangsiap.com/chats/send?id=' . $manager->hp);
-
-        $res = json_decode($response, true);
-
-        return new CommonResource(true, 'Cs Confirmation Successfully Added!', $res);
+        return $this->sendTextMessage($manager->hp, $employee->hp, $msg);
     }
 
     public function approveCs($token)
