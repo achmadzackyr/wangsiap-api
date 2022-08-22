@@ -398,8 +398,16 @@ class GatewayController extends Controller
             'pcs' => $mEx[6],
         ]);
 
+        $COD = $mEx[7] === 'Y' ? 'Ya' : 'Tidak';
+
         if ($order_status_id == 1) {
             $messageObject = $this->getWaReply($receiver, 1);
+            $messageObject->text = str_replace(array('((NAMA))', '((ALAMAT))', '((KODEPOS))', '((HP))',
+                '((COD))', '((KABUPATEN))', '((KECAMATAN))', '((PRODUK))', '((HARGAPRODUK))', '((JUMLAHPRODUK))',
+                '((ONGKIR))', '((TOTALHARGA))', '((TANGGALKADALUARSA))', '*1*', '*2*'),
+                array($mEx[1], $mEx[2], $mEx[3], $mEx[4], $COD, $destination->CITY_NAME, $destination->DISTRICT_NAME,
+                    $product->nama, $product->harga, $mEx[6], $total_ongkir, $total_harga, '30-08-2022 18.00', '1️⃣', '2️⃣'), $messageObject->text);
+
             $sendMessageResponse = $this->sendMessage($receiver, $sender, json_encode($messageObject));
         } else if ($order_status_id == 2) {
             $messageObject = $this->getWaReply($receiver, 2);
@@ -412,9 +420,14 @@ class GatewayController extends Controller
     public function orderx(Request $request)
     {
         $receiver = explode("@", $request->receiver, 2)[0];
-        $sender = explode("@", $request->receiver, 2)[0];
+        $sender = explode("@", $request->sender, 2)[0];
         $messageObject = $this->getWaReply($receiver, 1);
 
-        return $this->sendMessage($receiver, $sender, json_encode($messageObject));
+        $messageObject->text = str_replace(array('((NAMA))', '((ALAMAT))', '((KODEPOS))', '((HP))',
+            '((COD))', '((KABUPATEN))', '((KECAMATAN))', '((PRODUK))', '((HARGAPRODUK))', '((JUMLAHPRODUK))',
+            '((ONGKIR))', '((TOTALHARGA))', '((TANGGALKADALUARSA))', '*1*', '*2*'),
+            array('Achmad Zacky', 'Ciamis', '46271', '085223670378', 'COD', 'CIAMIS', 'CIJEUNGJING',
+                'Emas 10 g', 'Rp5.000.000', '1', 'Rp15.000', 'Rp5.015.000', '30-08-2022 18.00', '1️⃣', '2️⃣'), $messageObject->text);
+        return $this->sendMessage($sender, $receiver, json_encode($messageObject));
     }
 }
