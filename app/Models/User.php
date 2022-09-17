@@ -97,4 +97,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Employee::class);
     }
+
+    public function forms()
+    {
+        return $this->hasMany(Form::class);
+    }
 }

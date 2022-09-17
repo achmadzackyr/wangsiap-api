@@ -43,5 +43,26 @@ Apakah sudah sesuai? \
             'type' => 'text',
             'reply' => stripslashes(json_encode(["text" => $konfirmasiPemesanan])),
         ]);
+
+        Reply::create([
+            'hp' => '1234567890987654321',
+            'keyword' => 'default-pesanan-diterima',
+            'type' => 'text',
+            'reply' => stripslashes(json_encode(["text" => 'Terima kasih! Pesanan sudah masuk dan akan segera diproses'])),
+        ]);
+
+        Reply::create([
+            'hp' => '1234567890987654321',
+            'keyword' => 'default-pesanan-dibatalkan',
+            'type' => 'text',
+            'reply' => stripslashes(json_encode(["text" => 'Pesanan berhasil dibatalkan'])),
+        ]);
+
+        Reply::create([
+            'hp' => '1234567890987654321',
+            'keyword' => 'default-pesanan-kadaluarsa',
+            'type' => 'text',
+            'reply' => stripslashes(json_encode(["text" => 'Batas konfirmasi sudah terlewati (1 jam). Silahkan buat pesanan lagi!'])),
+        ]);
     }
 }

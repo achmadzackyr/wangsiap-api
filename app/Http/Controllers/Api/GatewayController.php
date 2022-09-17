@@ -315,16 +315,26 @@ class GatewayController extends Controller
 
         $user = User::where('hp', $receiver)->first();
         if ($user == null) {
+            $this->sendTextMessage($receiver, $sender, "Gangguan koneksi saat pengecekan data penjual. Silahkan coba lagi!");
             return response()->json(new GatewayResource(false, 'User Not Found', null), 404);
         }
 
         $product = Product::where('sku', $mEx[5])->where('user_id', $user->id)->first();
         if ($product == null) {
+            $availabelProducts = Product::where('user_id', $user->id)->get();
+            $msgProductNotFound = "Gangguan koneksi saat pengecekan data penjual. Silahkan coba lagi! \n";
+            $msgProductNotFound += "SKU yang tersedia saat ini: \n";
+            foreach ($availabelProducts as $p) {
+                $msgProductNotFound += $p->sku . " \n";
+            }
+            $this->sendTextMessage($receiver, $sender, $msgProductNotFound);
             return response()->json(new GatewayResource(false, 'Product Not Found', null), 404);
         }
 
         $destination = DB::table('jne_destination')->where('ZIP_CODE', $mEx[3])->first();
         if ($destination == null) {
+            $msgKodeposNotFound = "Kodepos tidak ditemukan harap cari dan cek kodeposmu di https://wangsiap.com/kodepos";
+            $this->sendTextMessage($receiver, $sender, $msgKodeposNotFound);
             return response()->json(new GatewayResource(false, 'Destination Not Found', null), 404);
         }
 
@@ -340,7 +350,7 @@ class GatewayController extends Controller
             'user_id' => $user->id,
         ]);
 
-        $total_harga = $product->harga * $mEx[6];
+        $subtotal_harga = $product->harga * $mEx[6];
         $total_berat = $product->berat * $mEx[6];
         $total_ongkir = null;
 
@@ -348,14 +358,8 @@ class GatewayController extends Controller
         $payment_method = 1;
         if ($mEx[7] != "Y" && $mEx[7] != "y") {
             $payment_method = 2;
+            $total_ongkir = 0;
         } else {
-            // return $reply = [
-            //     'username' => env('JNE_USERNAME'),
-            //     'api_key' => env('JNE_API_KEY'),
-            //     'from' => $user->from,
-            //     'thru' => $destination->TARIFF_CODE,
-            //     'weight' => $total_berat,
-            // ];
             //call api get tarif
             $tarif_response_raw = Http::acceptJson()->asForm()->post('http://apiv2.jne.co.id:10101/tracing/api/pricedev', [
                 'username' => env('JNE_USERNAME'),
@@ -366,15 +370,21 @@ class GatewayController extends Controller
             ]);
             $tarif_response = json_decode($tarif_response_raw, true);
             if (!$tarif_response['price']) {
+                $tarifNotFound = "Gangguan koneksi saat cek tarif. Silahkan coba lagi!";
+                $this->sendTextMessage($receiver, $sender, $tarifNotFound);
                 return response()->json(new GatewayResource(false, $tarif_response['error'], null), 404);
             }
             $collection = collect($tarif_response['price']);
             $filtered = $collection->whereIn('service_display', ['CTC', 'REG']);
             if (count($filtered) < 1) {
+                $tarifNotFound = "Gangguan koneksi saat cek tarif. Silahkan coba lagi!";
+                $this->sendTextMessage($receiver, $sender, $tarifNotFound);
                 return response()->json(new GatewayResource(false, 'Tarif With REG or CTC Not Found', null), 404);
             }
             $total_ongkir = $filtered->first()['price'];
         }
+
+        $total_harga = $subtotal_harga + $total_ongkir;
 
         $order = Order::create([
             'customer_id' => $customer->id,
@@ -399,22 +409,73 @@ class GatewayController extends Controller
         ]);
 
         $COD = $mEx[7] === 'Y' ? 'Ya' : 'Tidak';
+        $expiredDate = date("d-m-Y H:i:s", strtotime('+1 hours'));
 
-        if ($order_status_id == 1) {
-            $messageObject = $this->getWaReply($receiver, 1);
-            $messageObject->text = str_replace(array('((NAMA))', '((ALAMAT))', '((KODEPOS))', '((HP))',
-                '((COD))', '((KABUPATEN))', '((KECAMATAN))', '((PRODUK))', '((HARGAPRODUK))', '((JUMLAHPRODUK))',
-                '((ONGKIR))', '((TOTALHARGA))', '((TANGGALKADALUARSA))', '*1*', '*2*'),
-                array($mEx[1], $mEx[2], $mEx[3], $mEx[4], $COD, $destination->CITY_NAME, $destination->DISTRICT_NAME,
-                    $product->nama, $product->harga, $mEx[6], $total_ongkir, $total_harga, '30-08-2022 18.00', '1️⃣', '2️⃣'), $messageObject->text);
+        $messageObject = $this->getWaReply($receiver, 1);
+        $messageObject->text = str_replace(array('((NAMA))', '((ALAMAT))', '((KODEPOS))', '((HP))',
+            '((COD))', '((KABUPATEN))', '((KECAMATAN))', '((PRODUK))', '((HARGAPRODUK))', '((JUMLAHPRODUK))',
+            '((ONGKIR))', '((TOTALHARGA))', '((TANGGALKADALUARSA))', '*1*', '*2*'),
+            array($mEx[1], $mEx[2], $mEx[3], $mEx[4], $COD, $destination->CITY_NAME, $destination->DISTRICT_NAME,
+                $product->nama, $this->convertToIDR($product->harga), $mEx[6], $this->convertToIDR($total_ongkir), $this->convertToIDR($total_harga), $expiredDate, '1️⃣', '2️⃣'), $messageObject->text);
 
-            $sendMessageResponse = $this->sendMessage($receiver, $sender, json_encode($messageObject));
-        } else if ($order_status_id == 2) {
-            $messageObject = $this->getWaReply($receiver, 2);
-            $sendMessageResponse = $this->sendMessage($receiver, $sender, json_encode($messageObject));
-        }
+        $sendMessageResponse = $this->sendMessage($receiver, $sender, json_encode($messageObject));
 
         return new GatewayResource(true, 'Order Successfully Added!', $sendMessageResponse);
+    }
+
+    public function confirmOrder(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'no_pengirim_pesan' => 'required',
+            'no_penerima_pesan' => 'required',
+            'order_status_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $hp = explode("@", $request->no_pengirim_pesan, 2)[0];
+        $no_penerima_pesan = explode("@", $request->no_penerima_pesan, 2)[0];
+
+        $order = Order::where('no_pengirim', $hp)->latest()->first();
+        if ($order == null || $order->order_status_id != 1) {
+            $orderNotFound = "Data pesanan tidak ditemukan";
+            $this->sendTextMessage($no_penerima_pesan, $hp, $orderNotFound);
+            return new GatewayResource(false, 'Order not found', null);
+        }
+
+        //check if expire max 60 min
+        $now = \Carbon\Carbon::now();
+        $created_date = \Carbon\Carbon::createFromFormat('Y-m-d H:s:i', $order->created_at);
+
+        $diff_in_minutes = $now->diffInMinutes($created_date);
+        if ($diff_in_minutes <= 60) {
+            $order->update([
+                'order_status_id' => $request->order_status_id,
+            ]);
+
+            if ($request->order_status_id == 2) {
+                $messageObject = $this->getWaReply($no_penerima_pesan, 2);
+                $this->sendMessage($no_penerima_pesan, $hp, json_encode($messageObject));
+            } else if ($request->order_status_id == 5) {
+                $messageObject = $this->getWaReply($no_penerima_pesan, 3);
+                $this->sendMessage($no_penerima_pesan, $hp, json_encode($messageObject));
+            }
+
+            return new GatewayResource(true, 'Order Successfully Updated!', $order);
+        } else {
+            //check if still 24 hours
+            if ($diff_in_minutes <= 1440) {
+                $messageObject = $this->getWaReply($no_penerima_pesan, 11);
+                $this->sendMessage($no_penerima_pesan, $sender, json_encode($messageObject));
+                return new GatewayResource(false, 'Order expired', null);
+            } else {
+                $orderNotFound = "Data pesanan tidak ditemukan";
+                $this->sendTextMessage($no_penerima_pesan, $sender, $orderNotFound);
+                return new GatewayResource(false, 'Order not found', null);
+            }
+        }
     }
 
     public function orderx(Request $request)
@@ -429,5 +490,10 @@ class GatewayController extends Controller
             array('Achmad Zacky', 'Ciamis', '46271', '085223670378', 'COD', 'CIAMIS', 'CIJEUNGJING',
                 'Emas 10 g', 'Rp5.000.000', '1', 'Rp15.000', 'Rp5.015.000', '30-08-2022 18.00', '1️⃣', '2️⃣'), $messageObject->text);
         return $this->sendMessage($sender, $receiver, json_encode($messageObject));
+    }
+
+    public function convertToIDR(int $value)
+    {
+        return 'Rp' . number_format($value, 0, ',', '.');
     }
 }

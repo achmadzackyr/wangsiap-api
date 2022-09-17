@@ -157,6 +157,13 @@ class ProductController extends Controller
         return new ProductResource(true, 'List Data Products', $products);
     }
 
+    public function getMyProductForm()
+    {
+        $user = Auth::user();
+        $products = Product::where('user_id', $user->id)->latest()->paginate(10);
+        return new ProductResource(true, 'List Data Products', $products);
+    }
+
     public function getByProductDetail(Request $request)
     {
         $validator = Validator::make($request->all(), [

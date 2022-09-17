@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\CustomerStatusController;
 use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\FormController;
 use App\Http\Controllers\Api\GatewayController;
 use App\Http\Controllers\Api\LogController;
 use App\Http\Controllers\Api\OrderController;
@@ -33,6 +34,7 @@ Route::controller(AuthController::class)->group(function () {
         });
         Route::post('/auth/logout', 'logout');
         Route::post('/products/get-my-product', [ProductController::class, 'getMyProduct']);
+        Route::post('/products/get-my-product-form', [ProductController::class, 'getMyProductForm']);
         Route::post('/products/store-my-product', [ProductController::class, 'storeMyProduct']);
         Route::post('/products/check-my-sku', [ProductController::class, 'checkMySku']);
         Route::post('/products/get-my-product-detail', [ProductController::class, 'getByProductDetail']);
@@ -52,6 +54,7 @@ Route::controller(AuthController::class)->group(function () {
         Route::apiResource('/roles', RoleController::class);
         Route::apiResource('/templates', TemplateController::class);
         Route::apiResource('/user-templates', UserTemplateController::class);
+        Route::apiResource('/forms', FormController::class);
     });
 });
 
@@ -80,6 +83,7 @@ Route::post('/gateway/get-tarif', [GatewayController::class, 'getTarif']);
 Route::post('/gateway/downloadLoader', [GatewayController::class, 'downloadLoader']);
 Route::post('/gateway/orderx', [GatewayController::class, 'orderx']);
 Route::post('/gateway/orderfull', [GatewayController::class, 'orderFull']);
+Route::post('/gateway/confirm-order', [GatewayController::class, 'confirmOrder']);
 Route::get('/customers/export/all', [CustomerController::class, 'export']);
 Route::post('/orders/get-latest-by-sender', [OrderController::class, 'getLatestOrderBySender']);
 Route::put('/orders/update-status/{order}', [OrderController::class, 'updateStatus']);

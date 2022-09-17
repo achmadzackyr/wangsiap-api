@@ -276,7 +276,7 @@ class ReplyController extends Controller
         }
 
         $replies = Reply::where('hp', $request->hp)->get();
-        if (!$replies) {
+        if ($replies->count() < 1) {
             return response()->json(new CommonResource(false, "Reply tidak ditemukan", null), 404);
         }
 
