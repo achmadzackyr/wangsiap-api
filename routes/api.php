@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\CustomerStatusController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\FormController;
+use App\Http\Controllers\Api\FormProductController;
 use App\Http\Controllers\Api\GatewayController;
 use App\Http\Controllers\Api\LogController;
 use App\Http\Controllers\Api\OrderController;
@@ -49,12 +50,14 @@ Route::controller(AuthController::class)->group(function () {
         Route::post('/replies/delete', [ReplyController::class, 'delete']);
         Route::post('/replies/list', [ReplyController::class, 'list']);
         Route::post('/user-templates/get-reply', [UserTemplateController::class, 'getReply']);
+        Route::post('/forms/get-my-form', [FormController::class, 'getMyForm']);
 
         Route::apiResource('/subscriptions', SubscriptionController::class);
         Route::apiResource('/roles', RoleController::class);
         Route::apiResource('/templates', TemplateController::class);
         Route::apiResource('/user-templates', UserTemplateController::class);
         Route::apiResource('/forms', FormController::class);
+        Route::apiResource('/form-products', FormProductController::class);
     });
 });
 
@@ -90,3 +93,4 @@ Route::put('/orders/update-status/{order}', [OrderController::class, 'updateStat
 Route::post('/orders/get-order-detail', [OrderController::class, 'getOrderDetail']);
 Route::post('/ordered-products/get-by-order', [OrderedProductController::class, 'getByOrderId']);
 Route::post('/ordered-products/update-by-order', [OrderedProductController::class, 'updateByOrderId']);
+Route::post('/form-products/get-by-url', [FormProductController::class, 'getByUrl']);

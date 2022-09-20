@@ -30,7 +30,7 @@ class FormController extends Controller
         $user = Auth::user();
 
         //Check url unique per user
-        $form = Form::where('url', $request->url)->first();
+        $form = Form::where('user_id', $user->id)->where('url', $request->url)->first();
         if ($form != null) {
             return response()->json(new CommonResource(false, 'Form ' . $request->url . ' already exist', null), 500);
         }
@@ -61,8 +61,6 @@ class FormController extends Controller
             return response()->json(new CommonResource(false, $validator->errors(), null), 422);
         }
 
-        $user = Auth::user();
-
         $form->update([
             'url' => $request->url,
             'tanggal_mulai' => $request->tanggal_mulai,
@@ -76,5 +74,12 @@ class FormController extends Controller
     {
         $form->delete();
         return new CommonResource(true, 'Form Successfully Deleted!', null);
+    }
+
+    public function getMyForm()
+    {
+        $user = Auth::user();
+        $form = Form::where('user_id', $user->id)->latest()->paginate(10);
+        return new CommonResource(true, 'List Data My Form', $form);
     }
 }
