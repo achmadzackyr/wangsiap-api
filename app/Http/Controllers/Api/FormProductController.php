@@ -87,7 +87,12 @@ class FormProductController extends Controller
             return response()->json(new CommonResource(false, $validator->errors(), null), 422);
         }
 
-        $result = User::where('hp', $request->hp)->first()->forms()->where('url', $request->url)->first()->form_products()->get();
+        $result = User::where('hp', $request->hp)->first()
+            ->forms()->where('url', $request->url)->first()
+            ->form_products()
+            ->join('products', 'product_id', '=', 'products.id')
+            ->select('form_products.id as form_product_id', 'form_products.form_id as form_id',
+                'form_products.product_id as product_id', 'products.*')->get();
         return new CommonResource(true, 'Form Product Found!', $result);
     }
 }
